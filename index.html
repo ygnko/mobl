@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebXR Base64 Model Viewer</title>
+</head>
+<body>
+    <h1>WebXR Base64 Model Viewer</h1>
+    <div id="container" style="width: 100%; height: 100vh;"></div>
+
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.module.js';
+        import { XRButton } from 'https://cdn.jsdelivr.net/npm/three@0.154.0/examples/jsm/webxr/XRButton.js';
+
+        // THREE.js Scene Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10);
+        camera.position.z = 2;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // Add light
+        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+        light.position.set(0.5, 1, 0.25);
+        scene.add(light);
+
+        // Base64 encoded GLB data
+        const base64GLB = `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`;
+
+
+        try {
+            // Decode Base64 into a Blob
+            const binaryData = atob(base64GLB);
+            const arrayBuffer = new ArrayBuffer(binaryData.length);
+            const uintArray = new Uint8Array(arrayBuffer);
+
+            for (let i = 0; i < binaryData.length; i++) {
+                uintArray[i] = binaryData.charCodeAt(i);
+            }
+
+            const blob = new Blob([uintArray], { type: 'model/gltf-binary' });
+            const url = URL.createObjectURL(blob);
+
+            // Load the model manually without GLTFLoader
+            const loader = new THREE.GLTFLoader();
+            loader.load(
+                url,
+                (gltf) => {
+                    const model = gltf.scene;
+                    model.position.set(0, 0, 0); // Set model's position
+                    scene.add(model);
+                    console.log('Model loaded successfully');
+                },
+                undefined,
+                (error) => {
+                    console.error('An error occurred while loading the model:', error);
+                }
+            );
+        } catch (error) {
+            console.error('Failed to decode Base64 GLB data:', error);
+        }
+
+        // XR Button
+        document.body.appendChild(XRButton.createButton(renderer));
+
+        // Render Loop
+        const animate = () => {
+            renderer.setAnimationLoop(() => {
+                renderer.render(scene, camera);
+            });
+        };
+
+        animate();
+    </script>
+</body>
+</html>
